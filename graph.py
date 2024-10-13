@@ -1,5 +1,6 @@
 import networkx as nx
 import matplotlib.pyplot as plt
+from collections import deque
 
 # Створення графа
 G = nx.Graph()
@@ -20,9 +21,11 @@ G.add_nodes_from(stations)
 # Додавання ребер (лінії метро між станціями)
 edges = [
     # Червона лінія (M1)
-    ('Akademmistechko', 'Zhytomyrska'), ('Zhytomyrska', 'Sviatoshyn'), ('Sviatoshyn', 'Nyvky'), ('Nyvky', 'Beresteiska'),
+    ('Akademmistechko', 'Zhytomyrska'), ('Zhytomyrska', 'Sviatoshyn'), ('Sviatoshyn', 'Nyvky'),
+    ('Nyvky', 'Beresteiska'),
     ('Beresteiska', 'Shuliavska'), ('Shuliavska', 'Politekhnichnyi Instytut'), ('Politekhnichnyi Instytut', 'Vokzalna'),
-    ('Vokzalna', 'Universytet'), ('Universytet', 'Teatralna'), ('Teatralna', 'Khreshchatyk'), ('Khreshchatyk', 'Arsenalna'),
+    ('Vokzalna', 'Universytet'), ('Universytet', 'Teatralna'), ('Teatralna', 'Khreshchatyk'),
+    ('Khreshchatyk', 'Arsenalna'),
     ('Arsenalna', 'Dnipro'), ('Dnipro', 'Hidropark'), ('Hidropark', 'Livoberezhna'), ('Livoberezhna', 'Darnytsia'),
     ('Darnytsia', 'Chernihivska'), ('Chernihivska', 'Lisova'),
 
@@ -62,3 +65,40 @@ print(f"Кількість ребер: {num_edges}")
 print("Ступінь вершин:")
 for node, degree in degree_centrality.items():
     print(f"{node}: {degree:.2f}")
+
+
+# Функція для пошуку шляху за допомогою DFS
+def dfs_path(graph, start, goal):
+    stack = [(start, [start])]
+    while stack:
+        (vertex, path) = stack.pop()
+        for next_node in set(graph[vertex]) - set(path):
+            if next_node == goal:
+                return path + [next_node]
+            else:
+                stack.append((next_node, path + [next_node]))
+    return None
+
+
+# Функція для пошуку шляху за допомогою BFS
+def bfs_path(graph, start, goal):
+    queue = deque([(start, [start])])
+    while queue:
+        (vertex, path) = queue.popleft()
+        for next_node in set(graph[vertex]) - set(path):
+            if next_node == goal:
+                return path + [next_node]
+            else:
+                queue.append((next_node, path + [next_node]))
+    return None
+
+
+# Тестування шляхів для двох алгоритмів
+start_station = 'Akademmistechko'
+goal_station = 'Chervony Khutir'
+
+dfs_result = dfs_path(G, start_station, goal_station)
+bfs_result = bfs_path(G, start_station, goal_station)
+
+print("Шлях DFS:", dfs_result)
+print("Шлях BFS:", bfs_result)
